@@ -1,0 +1,69 @@
+{
+    "Product": [{
+        "description": "GHK-CU 50mg - 10 Vials",
+        "imageUrl": "images/medicine.png",
+        "installmentCount": "4",
+        "installmentPrice": "$4.50",
+        "name": "GHK-CU 50mg",
+        "price": "$12.65",
+        "regularPrice": "$16.65",
+        "salePrice": "$12.65",
+        "salePercentDiscount": "-24%",
+        "url": "https://synthrolab.com/product/ghk-cu-50mg/"
+    }, {
+        "description": "Product 1 Description",
+        "imageUrl": "http://www.gstatic.com/ads/standard_schemas/resources/product_1_tall.png",
+        "installmentCount": "2",
+        "installmentPrice": "$8.00",
+        "name": "Product 1 Name",
+        "price": "$10.00",
+        "regularPrice": "$12.35",
+        "salePrice": "$10.00",
+        "salePercentDiscount": "-19%",
+        "url": "https://www.google.com/search?q=product+1"
+    }, {
+        "description": "Product 2 Description",
+        "imageUrl": "http://www.gstatic.com/ads/standard_schemas/resources/product_2_wide.png",
+        "installmentCount": "",
+        "installmentPrice": "",
+        "name": "Product 2 Name",
+        "price": "$12.00",
+        "regularPrice": "$13.95",
+        "salePrice": "",
+        "salePercentDiscount": "",
+        "url": "https://www.google.com/search?q=product+2"
+    }, {
+        "description": "Product 3 Description",
+        "imageUrl": "http://www.gstatic.com/ads/standard_schemas/resources/product_3_tall.png",
+        "installmentCount": "4",
+        "installmentPrice": "$3.30",
+        "name": "Product 3 Name",
+        "price": "$8.45",
+        "regularPrice": "$8.45",
+        "salePrice": "",
+        "salePercentDiscount": "",
+        "url": "https://www.google.com/search?q=product+3"
+    }, {
+        "description": "Product 4 Description",
+        "imageUrl": "http://www.gstatic.com/ads/standard_schemas/resources/product_4_square.png",
+        "installmentCount": "5",
+        "installmentPrice": "$9.95",
+        "name": "Product 4 Name",
+        "price": "$33.95",
+        "regularPrice": "$45.95",
+        "salePrice": "$33.95",
+        "salePercentDiscount": "-26%",
+        "url": "https://www.google.com/search?q=product+4"
+    }, {
+        "description": "Product 5 Description",
+        "imageUrl": "http://www.gstatic.com/ads/standard_schemas/resources/product_5_wide.png",
+        "installmentCount": "5",
+        "installmentPrice": "$90.00",
+        "name": "Product 5 Name",
+        "price": "$320.00",
+        "regularPrice": "$400.00",
+        "salePrice": "$320.00",
+        "salePercentDiscount": "-20%",
+        "url": "https://www.google.com/search?q=product+5"
+    }]
+}
