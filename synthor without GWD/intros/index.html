@@ -288,19 +288,9 @@ m("gwd.textfitting.setMinFontSizePx",function(a){w.i=a});m("gwd.textfitting.setT
         cta: document.getElementById('item-cta')
       };
 
-      // Used as the click-through destination only when the current product
-      // (live feed or fallback) doesn't carry its own landing page url.
-      var DEFAULT_LANDING_URL = 'https://eliteracefab.com/products/yokohama-advan-apex-v601-tire-265-35r18-97y-yok110160114';
-
-      var FALLBACK_PRODUCTS = [
-        { name: 'Yokohama Advan Apex V601 Tire - 265/35R18 97Y', description: '265/35R18 97Y', regularPrice: '$334.02 USD', salePrice: '$230.99 USD', salePercentDiscount: '-31% OFF', imageUrl: 'tier.png', url: DEFAULT_LANDING_URL },
-        { name: 'CRG Blindsight 2 in. Mirror-Black', description: 'Round Bar-End Mirror', regularPrice: '$54.95 USD', salePrice: '$43.96 USD', salePercentDiscount: '-20% OFF', imageUrl: 'product2.jpg', url: 'https://eliteracefab.com/products/crg-blindsight-2-in-round-bar-end-mirror-black' }
-      ];
-
       var latestData = null;
       var currentIndex = 0;
       var rotateTimer = null;
-      var liveDataReceived = false;
       var currentProduct = null;
 
       function getProducts() {
@@ -312,6 +302,7 @@ m("gwd.textfitting.setMinFontSizePx",function(a){w.i=a});m("gwd.textfitting.setT
       function renderProduct(product, index) {
         if (!product) return;
         currentProduct = product;
+        currentIndex = index;
 
         if (els.title) {
           els.title.textContent = product.name || '';
@@ -372,23 +363,36 @@ m("gwd.textfitting.setMinFontSizePx",function(a){w.i=a});m("gwd.textfitting.setT
         if (!products || products.length <= 1) return;
         var slideCount = products.length;
         if (rotateTimer) clearInterval(rotateTimer);
-        currentIndex = 0;
         rotateTimer = setInterval(function() {
           currentIndex = (currentIndex + 1) % slideCount;
           fadeSwapTo(currentIndex);
         }, ROTATE_INTERVAL_MS);
       }
 
-      // Click-through: use the currently shown product's own landing page
-      // url when the feed (live or fallback) provided one, otherwise fall
-      // back to DEFAULT_LANDING_URL. Fires through the ad's real exit API
-      // so it registers as a proper click tag, not just a metric timer.
+      // Click-through: always the URL of whichever product is currently on
+      // screen, read straight off the live Dynamic Retail feed object. No
+      // hardcoded landing page here on purpose — if the feed hasn't bound
+      // a product yet, a click does nothing instead of sending the user to
+      // a stale/wrong URL. Different feed exports name this field slightly
+      // differently, so check the common variants.
       function getCurrentLandingUrl() {
-        return (currentProduct && currentProduct.url) || DEFAULT_LANDING_URL;
+        if (!currentProduct) return null;
+        return currentProduct.destinationUrl || currentProduct.url ||
+          currentProduct.landingPageUrl || currentProduct.finalUrl ||
+          currentProduct.clickUrl || null;
       }
 
       function handleClickThrough() {
         var url = getCurrentLandingUrl();
+        if (!url) return;
+        if (typeof Enabler !== 'undefined' && typeof Enabler.dynamicExit === 'function' &&
+            Enabler.isInitialized && Enabler.isInitialized()) {
+          // Per-product exit so Google Ads attributes the click to the
+          // correct item in the dynamic feed (currentIndex tracks whichever
+          // slide is on screen).
+          Enabler.dynamicExit('item_click', url, currentIndex);
+          return;
+        }
         var gwdAdEl = document.getElementById('gwd-ad');
         if (gwdAdEl && typeof gwdAdEl.exit === 'function') {
           gwdAdEl.exit('item_click', url);
@@ -403,9 +407,10 @@ m("gwd.textfitting.setMinFontSizePx",function(a){w.i=a});m("gwd.textfitting.setT
         clickArea.addEventListener('click', handleClickThrough);
       }
 
-      // Wrap the data binder so we can capture the live feed data (used to
-      // drive the auto-rotating slides) and immediately fix the first
-      // slide's price fallback, without touching how the feed itself binds.
+      // Wrap the data binder so we can capture the live Dynamic Retail feed
+      // data as soon as Google Ads binds it and start the rotation. All
+      // rendering is driven exclusively by this live data — there is no
+      // local/synthetic product fallback.
       var DataBinderCtor = customElements.get('gwd-data-binder');
       if (DataBinderCtor) {
         var originalBindData = DataBinderCtor.prototype.bindData;
@@ -414,7 +419,6 @@ m("gwd.textfitting.setMinFontSizePx",function(a){w.i=a});m("gwd.textfitting.setT
           latestData = data;
           var products = getProducts();
           if (!elements && products && products[0]) {
-            liveDataReceived = true;
             console.log('[product-carousel] live Google feed data bound, ' + products.length + ' product(s)');
             renderProduct(products[0], 0);
             startRotation();
@@ -422,16 +426,6 @@ m("gwd.textfitting.setMinFontSizePx",function(a){w.i=a});m("gwd.textfitting.setT
           return result;
         };
       }
-
-      // If Google's dynamic feed hasn't handed us real product data after a
-      // short wait, rotate through the local fallback products instead so
-      // the tile still shows more than one product with the same animation.
-      setTimeout(function() {
-        if (liveDataReceived) return;
-        console.log('[product-carousel] no live Google feed data received in 2s, using fallback products');
-        latestData = { Product: FALLBACK_PRODUCTS };
-        startRotation();
-      }, 2000);
     })();
   </script>
 
